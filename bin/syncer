@@ -40,10 +40,15 @@ function deployOnSameHost(){
     banner_shown=shown
   fi
 
+  ignore=${src_path}/.dev-tools.rc/ignored.txt
   if [ "$FULL_SYNC" = "yes" ]; then
     rsync -arvp --delete $src_path/ $target/
   else
-    rsync -arvp --delete --delete-excluded --exclude-from="${script_dir}/ignored.txt" $src_path/ $target/
+    if [ -f "$ignore" ]; then
+      rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $target/
+    else
+      rsync -arvp --delete $target/
+    fi
   fi
 }
 
@@ -60,6 +65,7 @@ function deployOnRemoteHost(){
   checSanity $src_path $dest_path
 
   target="${dest_user}@${dest_host}:${dest_path}"
+  ignore=${src_path}/.dev-tools.rc/ignored.txt
   if [ -z $banner_shown ]; then
     echo "*******************************************************"
     echo "*SYNCING files : $src_path -> $target "
@@ -70,7 +76,11 @@ function deployOnRemoteHost(){
   if [ "$FULL_SYNC" = "yes" ]; then
     rsync -arvp --delete $src_path/ $target/
   else
-    rsync -arvp --delete --delete-excluded --exclude-from="${script_dir}/ignored.txt" $src_path/ $target/
+    if [ -f "$ignore" ]; then
+      rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $target/
+    else
+      rsync -arvp --delete $target/
+    fi
   fi
 }
 

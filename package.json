@@ -1,6 +1,6 @@
 {
   "name": "drumee-server-dev-tools",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Drumee Server Development Toolkit",
   "scripts": {
     "pubnpush": "git push && npm version patch",

@@ -3,7 +3,7 @@ worker=$(basename $0)
 script_name=$(readlink -f $0)
 script_dir=$(dirname $script_name)
 script_tag=$(echo $script_dir | sed -e "s/\//-/g")
-source $script_dir/functions.sh
+source $script_dir/syncer
 
 proc_tag=$(echo $script_dir | sed -e "s/\//-/g" | sed -E "s/^\-|\-\.bin$|@//g" )
 
