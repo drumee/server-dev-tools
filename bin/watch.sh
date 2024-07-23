@@ -1,0 +1,74 @@
+#!/bin/bash
+worker=$(basename $0)
+script_name=$(readlink -f $0)
+script_dir=$(dirname $script_name)
+script_tag=$(echo $script_dir | sed -e "s/\//-/g")
+source $script_dir/functions.sh
+
+proc_tag=$(echo $script_dir | sed -e "s/\//-/g" | sed -E "s/^\-|\-\.bin$|@//g" )
+
+pidfile=/tmp/${proc_tag}.${worker}.${USER}.pid
+echo Using pidfile=$pidfile
+
+if [ -f $pidfile ]; then
+  pid=$(cat $pidfile)
+  plist=$(ps axo user:20,pid,cmd | grep $pid | grep $USER | grep -v grep | awk '{print $2}')
+  if [ "$plist" != "" ]; then
+    echo there is already a watcher with $pid
+    exit 1
+  fi
+fi
+
+
+pid=$$
+env_dir="$src_dir/.dev-tools.rc"
+env_file="$env_dir/devel.sh"
+if [ "$worker" = "drumee-deploy" ]; then
+  env_file="$env_dir/deploy.sh"
+fi
+
+if [ -f "$env_file" ]; then
+  source $env_file
+fi
+
+if [ "$DEST_USER" = "" ]; then
+  DEST_USER=$USER
+fi
+
+if [ "$DEST_DIR" = "" ]; then
+  echo "DEST_DIR env variable must set"
+  exit 1
+fi
+
+echo -n $pid > $pidfile
+
+# src_dir is provided by $script_dir/functions.sh
+if [ "$SRC_PATH" = "" ]; then
+  SRC_PATH=$src_dir
+fi
+
+export reload_after_update="$env_dir/reload.sh"
+if [[ "$worker" =~ deploy ]]; then
+  if [ -z "$DEST_HOST" ]; then
+    echo "Deploying files from $SRC_PATH, shall sync to $dest_dir"
+    deployOnSameHost $SRC_PATH $dest_dir $USER $USER/service
+  else
+    dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
+    ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
+    echo "Deploying files from $SRC_PATH, shall sync to $dest_dir"
+    deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR $DEST_ENDPOINT
+  fi
+  if [ -x $reload_after_update ]; then
+    $reload_after_update
+  fi
+else
+  if [ -z "$DEST_HOST" ]; then
+    echo "Watching files from $SRC_PATH, shall sync to $dest_dir"
+    listen --dir=$SRC_PATH deployOnSameHost $SRC_PATH $dest_dir $USER $USER/service
+  else
+    dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
+    ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
+    echo "Watching files from $SRC_PATH, shall sync to $dest_dir"
+    listen --dir=$SRC_PATH deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR $DEST_ENDPOINT
+  fi
+fi

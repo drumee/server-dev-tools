@@ -1,0 +1,16 @@
+{
+  "name": "@drumee/server-dev-tools",
+  "version": "0.0.1",
+  "description": "Drumee Server Development Toolkit",
+  "scripts": {
+    "pubnpush": "git push && npm version patch",
+    "postinstall": "bin/postinstall",
+    "release": "git commit -am '[CHG] function add white list destination' && npm run pubnpush"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:somanos/drumee-server-dev-tools.git"
+  },
+  "author": "Somanos Sar <somanos@drumee.com>",
+  "license": "MIT"
+}

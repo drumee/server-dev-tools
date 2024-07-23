@@ -1,0 +1,151 @@
+#!/bin/bash
+script_dir=$(dirname $(readlink -f $0))
+src_dir=$(dirname $(dirname $(dirname $script_dir)))
+
+# -------------------------------------------------------------------
+# Prevent overwriting system files
+# Only targets under /srv, /var and /home are allowed
+#-------------------------------------------------------------------
+function checSanity(){
+  src_path=$1/
+  dest_path=$2/
+  if [ ! -d $src_path ]; then
+    echo source not found $src_path
+    exit 1
+  fi
+
+  if [[ ! "$dest_path" =~ ^/(srv|home|var|opt)/+.+$ ]]; then
+    echo Invalid destination $dest_path
+    exit 1
+  fi
+}
+
+# -------------------------------------------------------------------
+# Deploy source into destination location and restart the new code
+# Source and destination are on the same host
+#-------------------------------------------------------------------
+function deployOnSameHost(){
+  src_path=$1
+  dest_path=$2
+  checSanity $src_path $dest_path
+
+  if [ ! -d $dest_path ]; then
+    mkdir -p $dest_path
+  fi
+
+  if [ -z $banner_shown ]; then
+    echo "*******************************************************"
+    echo "*SYNCING files : $src_path -> $dest_path "
+    echo "*******************************************************"	
+    banner_shown=shown
+  fi
+
+  if [ "$FULL_SYNC" = "yes" ]; then
+    rsync -arvp --delete $src_path/ $target/
+  else
+    rsync -arvp --delete --delete-excluded --exclude-from="${script_dir}/ignored.txt" $src_path/ $target/
+  fi
+}
+
+# -------------------------------------------------------------------
+# Deploy source into destination location and restart the new code
+# Source and destination are on diferrent hosts
+#-------------------------------------------------------------------
+function deployOnRemoteHost(){
+  src_path=$1
+  dest_user=$2
+  dest_host=$3
+  dest_path=$4
+
+  checSanity $src_path $dest_path
+
+  target="${dest_user}@${dest_host}:${dest_path}"
+  if [ -z $banner_shown ]; then
+    echo "*******************************************************"
+    echo "*SYNCING files : $src_path -> $target "
+    echo "*******************************************************"	
+    banner_shown=shown
+  fi
+
+  if [ "$FULL_SYNC" = "yes" ]; then
+    rsync -arvp --delete $src_path/ $target/
+  else
+    rsync -arvp --delete --delete-excluded --exclude-from="${script_dir}/ignored.txt" $src_path/ $target/
+  fi
+}
+
+
+function stopWatching() { 
+  echo "Caught SIGTERM signal!" 
+  exit
+}
+
+# -------------------------------------------------------------------
+# Watch current directory (recursively) for file changes, and execute
+# a command when a file or directory is created, modified or deleted.
+#
+# Written by: Senko Rasic <senko.rasic@dobarkod.hr>
+#
+# Requires Linux, bash and inotifywait (from inotify-tools package).
+#
+# To avoid executing the command multiple times when a sequence of
+# events happen, the script waits one second after the change - if
+# more changes happen, the timeout is extended by a second again.
+#-------------------------------------------------------------------
+function listen(){
+  dir=$1
+  if [ -z "$dir" ]; then
+    echo 'Usage: $0 --dir="list of firectories"'
+    exit -1;
+  fi
+  
+  trap stopWatching SIGTERM
+  trap stopWatching SIGINT
+
+  EVENTS="CREATE,CLOSE_WRITE,DELETE,MODIFY,MOVED_FROM,MOVED_TO"
+
+  for arg in "$@"
+  do
+    case $arg in
+      -d=*|--dir=*)
+        dir="${arg#*=}"
+        shift
+        ;;
+    esac
+  done
+
+  echo "Listening to directories : $dir"
+
+  inotifywait -e "$EVENTS" -m -r --format '%:e %f' $dir | (\
+    WAITING="";
+    while true; do
+      z="$@"
+      LINE="";
+      read -t 1 LINE;
+      if test -z "$LINE"; then
+        if test ! -z "$WAITING"; then
+          echo "CHANGE $z";
+          WAITING="";
+        fi;
+      else
+        WAITING=1;
+      fi;
+    done ) | (
+    while true; do
+      read TMP;
+      #echo "STATE = $state"
+      if [ "$state" != "pending" ]; then
+        state=pending
+        date +"Updating: %H:%M:%S"
+        $@
+        if [ -x "$reload_after_update" ]; then
+          date +"Reloading: %H:%M:%S"
+          $reload_after_update
+        fi
+        date +"Updated: %H:%M:%S"
+        state=finished
+      fi
+    done )
+}
+
+

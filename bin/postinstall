@@ -1,0 +1,6 @@
+#!/bin/bash
+script_dir=$(dirname $(readlink -f $0))
+cd $script_dir/../../../node_modules/.bin
+ln -sf ../@drumee/server-dev-tools/bin/watch.sh ./drumee-server-devel
+ln -sf ../@drumee/server-dev-tools/bin/watch.sh ./drumee-server-deploy
+cp -r ../.dev-tools.rc $script_dir/../../../
