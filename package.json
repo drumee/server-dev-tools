@@ -1,5 +1,5 @@
 {
-  "name": "@drumee/server-dev-tools",
+  "name": "drumee-server-dev-tools",
   "version": "0.0.1",
   "description": "Drumee Server Development Toolkit",
   "scripts": {
