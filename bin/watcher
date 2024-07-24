@@ -3,8 +3,9 @@ worker=$(basename $0)
 script_name=$(readlink -f $0)
 script_dir=$(dirname $script_name)
 script_tag=$(echo $script_dir | sed -e "s/\//-/g")
-source $script_dir/syncer
 
+source $script_dir/syncer
+src_dir=$PWD
 
 pid=$$
 env_dir="$src_dir/.dev-tools.rc"
@@ -13,8 +14,14 @@ if [[ "$worker" =~ deploy ]]; then
   env_file="$env_dir/deploy.sh"
 fi
 
+echo "Using resource file from $env_file $src_dir"
+
 if [ -f "$env_file" ]; then
   source $env_file
+else
+  echo "Resource file was not found"
+  exit 1
+
 fi
 
 if [ "$DEST_USER" = "" ]; then

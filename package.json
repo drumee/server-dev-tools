@@ -1,9 +1,10 @@
 {
   "name": "@drumee/server-dev-tools",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Drumee Server Development Helper",
   "scripts": {
-    "postinstall": "bin/postinstall"
+    "postinstall": "bin/postinstall",
+    "release": "git push && npm publish --access public && npm version patch"
   },
   "repository": {
     "type": "git",
