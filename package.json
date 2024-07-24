@@ -1,11 +1,9 @@
 {
-  "name": "drumee-server-dev-tools",
-  "version": "0.0.7",
-  "description": "Drumee Server Development Toolkit",
+  "name": "@drumee/server-dev-tools",
+  "version": "1.0.0",
+  "description": "Drumee Server Development Helper",
   "scripts": {
-    "pubnpush": "git push && npm version patch",
-    "postinstall": "bin/postinstall",
-    "release": "git commit -am '[CHG] function add white list destination' && npm run pubnpush"
+    "postinstall": "bin/postinstall"
   },
   "repository": {
     "type": "git",
