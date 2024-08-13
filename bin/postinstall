@@ -13,10 +13,8 @@ if [ -d $module_dir/.bin ]; then
   fi
 else
   # Global install
-  if [ -d "$NODE_PATH" ]; then
-    cd /usr/bin
-    ln -sf $script_dir/watcher ./drumee-server-devel
-    ln -sf $script_dir/watcher ./drumee-server-deploy
-    ln -sf $base_dir/index.js ./drumee-server-plugin
-  fi
+  cd /usr/bin
+  ln -sf $script_dir/watcher ./drumee-server-devel
+  ln -sf $script_dir/watcher ./drumee-server-deploy
+  ln -sf $base_dir/index.js ./drumee-server-plugin
 fi

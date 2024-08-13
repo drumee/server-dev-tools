@@ -11,7 +11,6 @@ const JSON_OPT = { spaces: 2, EOL: "\r\n" };
 const argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('Usage: $0 --plugin=/path/to/plugin/dir --endpoint=[main]')
   .default('endpoint', "main")
-  .demandOption(['plugin'])
   .parse();
 let { _, plugin, endpoint } = argv;
 const action = _[0] || 'add';
