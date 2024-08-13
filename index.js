@@ -14,7 +14,11 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
   .parse();
 let { _, plugin, endpoint } = argv;
 const action = _[0] || 'add';
-plugin = plugin.replace(/\/+$/, '');
+if(/^(add|remove)$/.test(action)){
+  if(!plugin){
+    failed("Require plugin path")
+  }  
+}
 
 function failed(msg) {
   console.error(msg);
