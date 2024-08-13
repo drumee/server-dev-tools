@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const { writeFileSync, readFileSync } = require(`jsonfile`);
-const { join } = require("path");
+const { join, basename } = require("path");
 const { exit } = process;
 const {
   existsSync
@@ -54,6 +54,9 @@ const actions = {
     })
     console.log(`Writing data into ${confFile}`, plugins);
     writeFileSync(confFile, plugins, JSON_OPT);
+  },
+  list: async function () {
+    console.log(plugins.acl);
   }
 }
 
@@ -67,4 +70,7 @@ if (cmd) {
       console.error("Failed to setup Drumee infra", e);
       exit(0);
     });
+}else{
+  console.log(`Invalid command ${action}\n`, `Usage : ${basename(argv.$0)} add|remove|list`);
 }
+
