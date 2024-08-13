@@ -12,11 +12,11 @@ if [ -d $module_dir/.bin ]; then
     cp -r $base_dir/.dev-tools.rc $src_dir/
   fi
 else
+  # Global install
   if [ -d "$NODE_PATH" ]; then
-    bin_dir=$(dirname $NODE_PATH)
-    cd $bin_dir
+    cd /usr/bin
     ln -sf $script_dir/watcher ./drumee-server-devel
     ln -sf $script_dir/watcher ./drumee-server-deploy
-    ln -sf $src_dir/index ./drumee-server-plugin
+    ln -sf $src_dir/index.js ./drumee-server-plugin
   fi
 fi
