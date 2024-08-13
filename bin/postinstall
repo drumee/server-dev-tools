@@ -12,8 +12,11 @@ if [ -d $module_dir/.bin ]; then
     cp -r $base_dir/.dev-tools.rc $src_dir/
   fi
 else
-  cd $script_dir
-  ln -sf watcher drumee-server-devel
-  ln -sf watcher drumee-server-deploy
-  ln -sf ../index.js drumee-server-plugin
+  if [ -d "$NODE_PATH" ]; then
+    bin_dir=$(dirname $NODE_PATH)
+    cd $bin_dir
+    ln -sf $script_dir/watcher ./drumee-server-devel
+    ln -sf $script_dir/watcher ./drumee-server-deploy
+    ln -sf $src_dir/index ./drumee-server-plugin
+  fi
 fi
