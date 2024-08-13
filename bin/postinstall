@@ -17,6 +17,6 @@ else
     cd /usr/bin
     ln -sf $script_dir/watcher ./drumee-server-devel
     ln -sf $script_dir/watcher ./drumee-server-deploy
-    ln -sf $src_dir/index.js ./drumee-server-plugin
+    ln -sf $base_dir/index.js ./drumee-server-plugin
   fi
 fi
