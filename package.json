@@ -1,6 +1,6 @@
 {
   "name": "@drumee/server-dev-tools",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Drumee Server Development Helper",
   "scripts": {
     "postinstall": "bin/postinstall",
@@ -11,5 +11,9 @@
     "url": "git@github.com:somanos/drumee-server-dev-tools.git"
   },
   "author": "Somanos Sar <somanos@drumee.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "jsonfile": "^6.1.0",
+    "yargs": "^17.7.2"
+  }
 }
