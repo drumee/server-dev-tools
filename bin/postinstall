@@ -7,14 +7,14 @@ if [ -d $module_dir/.bin ]; then
   cd $module_dir/.bin
   ln -sf ../@drumee/server-dev-tools/bin/watcher ./drumee-server-devel
   ln -sf ../@drumee/server-dev-tools/bin/watcher ./drumee-server-deploy
-  ln -sf ../@drumee/server-dev-tools/index.js ./drumee-server-plugin
+  ln -sf ../@drumee/server-dev-tools/bin/plugin.js ./drumee-server-plugin
+  ln -sf ../@drumee/server-dev-tools/bin/endpoint.js ./drumee-server-endpoint
   if [ ! -d $src_dir/.dev-tools.rc ]; then
-    cp -r $base_dir/.dev-tools.rc $src_dir/
+    cp -r $base_dir/.dev-tools.tpl $src_dir/.dev-tools.rc
   fi
 else
   # Global install
   cd /usr/bin
-  ln -sf $script_dir/watcher ./drumee-server-devel
-  ln -sf $script_dir/watcher ./drumee-server-deploy
-  ln -sf $base_dir/index.js ./drumee-server-plugin
+  ln -sf $script_dir/plugin.js drumee-server-plugin
+  ln -sf $script_dir/endpoint.js drumee-server-endpoint
 fi

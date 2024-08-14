@@ -15,5 +15,8 @@
   "dependencies": {
     "jsonfile": "^6.1.0",
     "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@drumee/server-essentials": "^1.0.4"
   }
 }

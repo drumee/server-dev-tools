@@ -140,4 +140,5 @@ git-status.*
 *~
 .fuse*
 build/
+.dev-tools.rc/
 t
