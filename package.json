@@ -1,6 +1,6 @@
 {
   "name": "@drumee/server-dev-tools",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Drumee Server Development Helper",
   "scripts": {
     "postinstall": "bin/postinstall",
