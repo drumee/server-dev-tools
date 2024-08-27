@@ -1,6 +1,6 @@
 {
   "name": "@drumee/server-dev-tools",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Drumee Server Development Helper",
   "scripts": {
     "postinstall": "bin/postinstall",
@@ -17,6 +17,6 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@drumee/server-essentials": "^1.0.4"
+    "@drumee/server-essentials": "^1.0.5"
   }
 }
