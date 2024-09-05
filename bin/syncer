@@ -46,7 +46,7 @@ function deployOnSameHost(){
     if [ -f "$ignore" ]; then
       rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $target/
     else
-      rsync -arvp --delete $target/
+      rsync -arvp --delete  $src_path/ $target/
     fi
   fi
 }
@@ -78,7 +78,7 @@ function deployOnRemoteHost(){
     if [ -f "$ignore" ]; then
       rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $target/
     else
-      rsync -arvp --delete $target/
+      rsync -arvp --delete $src_path/ $target/
     fi
   fi
 }
