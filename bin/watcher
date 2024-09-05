@@ -59,7 +59,7 @@ export reload_after_update="$env_dir/reload.sh"
 if [[ "$worker" =~ deploy ]]; then
   if [ -z "$DEST_HOST" ]; then
     echo "Deploying files from $SRC_PATH, shall locally sync to $DEST_DIR"
-    deployOnSameHost $SRC_PATH $DEST_DIR $USER $USER/service
+    deployOnSameHost $SRC_PATH $DEST_DIR $USER
   else
     dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
     ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
@@ -72,7 +72,7 @@ if [[ "$worker" =~ deploy ]]; then
 else
   if [ -z "$DEST_HOST" ]; then
     echo "Watching files from $SRC_PATH, shall locally sync to $DEST_DIR"
-    listen --dir=$SRC_PATH deployOnSameHost $SRC_PATH $DEST_DIR $USER $USER/service
+    listen --dir=$SRC_PATH deployOnSameHost $SRC_PATH $DEST_DIR
   else
     dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
     ssh ${DEST_HOST} mkdir -p ${DEST_DIR}

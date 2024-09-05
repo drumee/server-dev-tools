@@ -1,5 +1,6 @@
 #!/bin/bash
 script_dir=$(dirname $(readlink -f $0))
+#set -e
 
 # -------------------------------------------------------------------
 # Prevent overwriting system files
@@ -41,12 +42,12 @@ function deployOnSameHost(){
 
   ignore=${src_path}/.dev-tools.rc/ignored.txt
   if [ "$FULL_SYNC" = "yes" ]; then
-    rsync -arvp --delete $src_path/ $target/
+    rsync -arvp --delete $src_path/ $dest_path/
   else
     if [ -f "$ignore" ]; then
-      rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $target/
+      rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $dest_path/
     else
-      rsync -arvp --delete  $src_path/ $target/
+      rsync -arvp --delete --delete-excluded  $src_path/ $target/
     fi
   fi
 }
@@ -78,7 +79,7 @@ function deployOnRemoteHost(){
     if [ -f "$ignore" ]; then
       rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $target/
     else
-      rsync -arvp --delete $src_path/ $target/
+      rsync -arvp --delete --delete-excluded $src_path/ $target/
     fi
   fi
 }
