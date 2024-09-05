@@ -58,12 +58,12 @@ echo -n $pid > $pidfile
 export reload_after_update="$env_dir/reload.sh"
 if [[ "$worker" =~ deploy ]]; then
   if [ -z "$DEST_HOST" ]; then
-    echo "Deploying files from $SRC_PATH, shall sync to $dest_dir"
-    deployOnSameHost $SRC_PATH $dest_dir $USER $USER/service
+    echo "Deploying files from $SRC_PATH, shall locally sync to $DEST_DIR"
+    deployOnSameHost $SRC_PATH $DEST_DIR $USER $USER/service
   else
     dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
     ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
-    echo "Deploying files from $SRC_PATH, shall sync to $dest_dir"
+    echo "Deploying files from $SRC_PATH, shall remotely deploy to $dest_dir"
     deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR $DEST_ENDPOINT
   fi
   if [ -x $reload_after_update ]; then
@@ -71,12 +71,12 @@ if [[ "$worker" =~ deploy ]]; then
   fi
 else
   if [ -z "$DEST_HOST" ]; then
-    echo "Watching files from $SRC_PATH, shall sync to $dest_dir"
-    listen --dir=$SRC_PATH deployOnSameHost $SRC_PATH $dest_dir $USER $USER/service
+    echo "Watching files from $SRC_PATH, shall locally sync to $DEST_DIR"
+    listen --dir=$SRC_PATH deployOnSameHost $SRC_PATH $DEST_DIR $USER $USER/service
   else
     dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
     ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
-    echo "Watching files from $SRC_PATH, shall sync to $dest_dir"
+    echo "Watching files from $SRC_PATH, shall remotely sync to $dest_dir"
     listen --dir=$SRC_PATH deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR $DEST_ENDPOINT
   fi
 fi
