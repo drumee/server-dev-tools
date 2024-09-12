@@ -64,7 +64,7 @@ if [[ "$worker" =~ deploy ]]; then
     dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
     ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
     echo "Deploying files from $SRC_PATH, shall remotely deploy to $dest_dir"
-    deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR $DEST_ENDPOINT
+    deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR 
   fi
   if [ -x $reload_after_update ]; then
     $reload_after_update
@@ -77,6 +77,6 @@ else
     dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
     ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
     echo "Watching files from $SRC_PATH, shall remotely sync to $dest_dir"
-    listen --dir=$SRC_PATH deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR $DEST_ENDPOINT
+    listen --dir=$SRC_PATH deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR
   fi
 fi
