@@ -1,6 +1,5 @@
 #!/bin/bash
 script_dir=$(dirname $(readlink -f $0))
-#set -e
 
 # -------------------------------------------------------------------
 # Prevent overwriting system files
@@ -20,6 +19,36 @@ function checSanity(){
   fi
 }
 
+# Actually sync src to destination accordingly to preset
+#
+function applySync(){
+  src_path=$1
+  dest_path=$2
+
+  if [ -z $banner_shown ]; then
+    echo "*******************************************************"
+    echo "*SYNCING files : $src_path -> $dest_path "
+    echo "*******************************************************"	
+    banner_shown=shown
+  fi
+
+  if [ "SYNC_OPTIONS" = "" ];
+    SYNC_OPTIONS="--delete"
+  fi 
+  
+  ignore=${src_path}/.dev-tools.rc/ignore.txt
+  if [ ! -f "$ignore" ]; then 
+    ignore=${src_path}/.dev-tools.rc/ignored.txt
+  fi 
+
+  if [ -f "$ignore" ]; then
+    SYNC_OPTIONS="$SYNC_OPTIONS --delete-excluded"
+    rsync -arvp $SYNC_OPTIONS --exclude-from="${ignore}" $src_path/ $target/
+  else
+    rsync -arvp $SYNC_OPTIONS $src_path/ $target/
+  fi
+}
+
 # -------------------------------------------------------------------
 # Deploy source into destination location and restart the new code
 # Source and destination are on the same host
@@ -32,24 +61,7 @@ function deployOnSameHost(){
   if [ ! -d $dest_path ]; then
     mkdir -p $dest_path
   fi
-
-  if [ -z $banner_shown ]; then
-    echo "*******************************************************"
-    echo "*SYNCING files : $src_path -> $dest_path "
-    echo "*******************************************************"	
-    banner_shown=shown
-  fi
-
-  ignore=${src_path}/.dev-tools.rc/ignored.txt
-  if [ "$FULL_SYNC" = "yes" ]; then
-    rsync -arvp --delete $src_path/ $dest_path/
-  else
-    if [ -f "$ignore" ]; then
-      rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $dest_path/
-    else
-      rsync -arvp --delete --delete-excluded  $src_path/ $target/
-    fi
-  fi
+  applySync $src_path $dest_path
 }
 
 # -------------------------------------------------------------------
@@ -63,25 +75,13 @@ function deployOnRemoteHost(){
   dest_path=$4
 
   checSanity $src_path $dest_path
+  if [ "$dest_user" = "" ]; then
+    dest_user=$USER;
+  fi
 
   target="${dest_user}@${dest_host}:${dest_path}"
-  ignore=${src_path}/.dev-tools.rc/ignored.txt
-  if [ -z $banner_shown ]; then
-    echo "*******************************************************"
-    echo "*SYNCING files : $src_path -> $target "
-    echo "*******************************************************"	
-    banner_shown=shown
-  fi
+  applySync $src_path $target
 
-  if [ "$FULL_SYNC" = "yes" ]; then
-    rsync -arvp --delete $src_path/ $target/
-  else
-    if [ -f "$ignore" ]; then
-      rsync -arvp --delete --delete-excluded --exclude-from="${ignore}" $src_path/ $target/
-    else
-      rsync -arvp --delete --delete-excluded $src_path/ $target/
-    fi
-  fi
 }
 
 
