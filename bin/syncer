@@ -25,12 +25,8 @@ function applySync(){
   src_path=$1
   dest_path=$2
 
-  if [ -z $banner_shown ]; then
-    echo "*******************************************************"
-    echo "*SYNCING files : $src_path -> $dest_path "
-    echo "*******************************************************"	
-    banner_shown=shown
-  fi
+  date +"Updating: %H:%M:%S"
+  echo "SYNCING $src_path -> $dest_path "
 
   if [ "SYNC_OPTIONS" = "" ]; then
     SYNC_OPTIONS="--delete"
@@ -47,6 +43,15 @@ function applySync(){
   else
     rsync -arvp $SYNC_OPTIONS $src_path/ $target/
   fi
+
+  echo  $reload_after_update
+
+  date +"Updated: %H:%M:%S"
+  if [ -x "$reload_after_update" ]; then
+    date +"Reloading: %H:%M:%S"
+    $reload_after_update
+  fi
+
 }
 
 # -------------------------------------------------------------------
@@ -81,7 +86,6 @@ function deployOnRemoteHost(){
 
   target="${dest_user}@${dest_host}:${dest_path}"
   applySync $src_path $target
-
 }
 
 
