@@ -14,7 +14,7 @@ if [[ "$worker" =~ deploy ]]; then
   env_file="$env_dir/deploy.sh"
 fi
 
-echo "Using resource file from $env_file $src_dir"
+echo "Using resource file from $env_file"
 
 if [ -f "$env_file" ]; then
   source $env_file
@@ -39,21 +39,12 @@ if [ "$SRC_PATH" = "" ]; then
   SRC_PATH=$src_dir
 fi
 
-proc_tag=$(echo $SRC_PATH | sed -e "s/\//-/g" | sed -E "s/^\-|\-\.bin$|@//g" )
-
-pidfile=/tmp/${proc_tag}.${worker}.${USER}.pid
-echo Using pidfile=$pidfile
-
-if [ -f $pidfile ]; then
-  pid=$(cat $pidfile)
-  plist=$(ps axo user:20,pid,cmd | grep $pid | grep $USER | grep -v grep | awk '{print $2}')
-  if [ "$plist" != "" ]; then
-    echo there is already a watcher with $pid
-    exit 1
-  fi
+plist=$(ps -ax | grep -w ${script_dir}/watch.js | grep -v grep | awk '{print $1}')
+echo PLIST=$plist
+if [ "$plist" != "" ]; then
+  echo there is already a watcher with $plist
+  exit 1
 fi
-
-echo -n $pid > $pidfile
 
 export reload_after_update="$env_dir/reload.sh"
 if [[ "$worker" =~ deploy ]]; then
@@ -72,11 +63,11 @@ if [[ "$worker" =~ deploy ]]; then
 else
   if [ -z "$DEST_HOST" ]; then
     echo "Watching files from $SRC_PATH, shall locally sync to $DEST_DIR"
-    listen --dir=$SRC_PATH deployOnSameHost $SRC_PATH $DEST_DIR $USER $USER/service
+    ${script_dir}/watch.js --dir=$SRC_PATH --on-change="deployOnSameHost $SRC_PATH $DEST_DIR"
   else
     dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
     ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
     echo "Watching files from $SRC_PATH, shall remotely sync to $dest_dir"
-    listen --dir=$SRC_PATH deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR
+    ${script_dir}/watch.js --dir=$SRC_PATH --on-change="deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR"
   fi
 fi
