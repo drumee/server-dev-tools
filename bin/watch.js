@@ -20,11 +20,17 @@ if (!existsSync(argv.dir)) {
   exit(1);
 }
 console.log(`Watching changes on ${argv.dir}`);
+let timer = null;
 watch(argv.dir, {
   encoding: 'utf8', recursive: true
 }, (e, filename) => {
-  let cmd = join(__dirname, "handler")
-  exec(`${cmd} ${argv.onChange}`)
+  if(timer) return;
+  timer = setTimeout(() => {
+    let cmd = join(__dirname, "handler")
+    console.log(`${cmd}`);
+    exec(`${cmd} ${argv.onChange}`);
+    timer = null;
+  }, 500)
 });
 
 
