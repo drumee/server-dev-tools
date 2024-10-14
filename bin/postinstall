@@ -3,6 +3,7 @@ script_dir=$(dirname $(readlink -f $0))
 base_dir=$(dirname $script_dir)
 module_dir=$(dirname $(dirname $base_dir))
 src_dir=$(dirname $module_dir)
+mkdir - p $module_dir/.bin
 if [ -d $module_dir/.bin ]; then
   cd $module_dir/.bin
   ln -sf ../@drumee/server-dev-tools/bin/watcher ./drumee-server-devel
@@ -12,9 +13,4 @@ if [ -d $module_dir/.bin ]; then
   if [ ! -d $src_dir/.dev-tools.rc ]; then
     cp -r $base_dir/.dev-tools.tpl $src_dir/.dev-tools.rc
   fi
-else
-  # Global install
-  cd /usr/bin
-  ln -sf $script_dir/plugin.js drumee-server-plugin
-  ln -sf $script_dir/endpoint.js drumee-server-endpoint
 fi
