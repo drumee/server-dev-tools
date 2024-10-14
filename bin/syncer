@@ -37,6 +37,8 @@ function applySync(){
 
   if [ "SYNC_OPTIONS" = "" ]; then
     SYNC_OPTIONS="--delete"
+  elif [ "SYNC_OPTIONS" = "merge" ]; then
+    SYNC_OPTIONS=""
   fi 
   
   ignore=${src_path}.dev-tools.rc/ignore.txt
