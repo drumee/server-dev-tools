@@ -13,11 +13,12 @@
   "author": "Somanos Sar <somanos@drumee.com>",
   "license": "MIT",
   "dependencies": {
+    "argparse": "^2.0.1",
     "jsonfile": "^6.1.0",
     "shelljs": "^0.8.5",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@drumee/server-essentials": "^1.0.5"
+    "@drumee/server-essentials": "^1.1.17"
   }
 }
