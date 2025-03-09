@@ -24,27 +24,34 @@ function checSanity(){
 function applySync(){
   src_path=$1
   dest_path=$2
+  if [[ ! "$1" =~ ^/.+/$ ]]; then
+    src_path=$1/
+  fi
+  if [[ ! "$2" =~ ^/.+/$ ]]; then
+    dest_path=$2/
+  fi
+  
 
   date +"Updating: %H:%M:%S"
   echo "SYNCING $src_path -> $dest_path "
 
   if [ "SYNC_OPTIONS" = "" ]; then
     SYNC_OPTIONS="--delete"
+  elif [ "SYNC_OPTIONS" = "merge" ]; then
+    SYNC_OPTIONS=""
   fi 
   
-  ignore=${src_path}/.dev-tools.rc/ignore.txt
+  ignore=${src_path}.dev-tools.rc/ignore.txt
   if [ ! -f "$ignore" ]; then 
-    ignore=${src_path}/.dev-tools.rc/ignored.txt
+    ignore=${src_path}.dev-tools.rc/ignored.txt
   fi 
 
   if [ -f "$ignore" ]; then
     SYNC_OPTIONS="$SYNC_OPTIONS --delete-excluded"
-    rsync -arvp $SYNC_OPTIONS --exclude-from="${ignore}" $src_path/ $target/
+    rsync -arvp $SYNC_OPTIONS --exclude-from="${ignore}" $src_path $dest_path
   else
-    rsync -arvp $SYNC_OPTIONS $src_path/ $target/
+    rsync -arvp $SYNC_OPTIONS $src_path $dest_path
   fi
-
-  echo  $reload_after_update
 
   date +"Updated: %H:%M:%S"
   if [ -x "$reload_after_update" ]; then

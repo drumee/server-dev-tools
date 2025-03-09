@@ -1,24 +1,18 @@
 #!/usr/bin/env node
 
 const { readFileSync } = require(`jsonfile`);
-const { join, basename } = require("path");
+const { join } = require("path");
 const { sysEnv, Template } = require("@drumee/server-essentials");
-const { writeConfigs, parser, action, failed } = require("../lib");
+const { writeConfigs, failed } = require("../lib");
 const infra_dir = "/etc/drumee/infrastructure";
 const confFile = join(infra_dir, "ecosystem.json");
+const args = require('./args');
+const { action, endpoint, instances } = args;
+
 const {
   rmSync, existsSync
 } = require("fs");
-let argv = {};
-if (/^(add|remove)$/.test(action)) {
-  argv = parser
-    .usage('Usage: $0 --endpoint=<endpoint_name> --instances=[1]')
-    .default('instances', 1)
-    .demandOption("endpoint")
-    .parse();
-}
 
-const { endpoint, instances } = argv;
 const routeFile = join(infra_dir, "routes", `${endpoint}.conf`);
 
 let endpoints = readFileSync(confFile) || { acl: [] };
@@ -35,29 +29,56 @@ function worker(data, instances = 1) {
     restPort,
     name,
     server_dir,
+    ui_dir,
     runtime_dir,
   } = data;
   if (!server_dir) server_dir = join(runtime_dir, 'server');
-  let base = `${server_dir}/dist/${route}`;
+  if (!ui_dir) ui_dir = join(runtime_dir, 'ui');
+  let server_home = data.server_home || `${server_dir}/${route}`;
+  let ui_home = data.ui_home || `${ui_dir}/${route}`;
   let exec_mode = 'fork_mode';
   if (instances > 1) {
     exec_mode = 'cluster_mode';
   }
-  return {
+  let opt = {
     name,
     script,
-    cwd: base,
+    cwd: server_home,
     args: `--pushPort=${pushPort} --restPort=${restPort}`,
     route,
     env: {
-      cwd: base,
+      cwd: server_home,
       route,
-      server_home: base,
+      server_home,
+      ui_home
     },
     dependencies: [`pm2-logrotate`],
     exec_mode,
     instances
   };
+
+  if (args.watchDirs) {
+    let dirs = args.watchDirs.split(/,+/);
+    if (dirs.length) {
+      opt.watch = dirs;
+      opt.watch_delay = args.watchDelay;
+      if (args.watchSymLinks) {
+        opt.watch_options = {
+          followSymlinks: true
+        }
+      } else {
+        opt.watch_options = {
+          followSymlinks: false
+        }
+      }
+      let ignored = args.watchIgnore.split(/,+/);
+      if (ignored.length) {
+        opt.ignore_watch = ignored;
+      }
+    }
+  }
+
+  return opt;
 }
 
 /**
@@ -93,11 +114,23 @@ function endpointExist() {
 function add() {
   if (endpointExist()) {
     failed(`Endpoint ${endpoint} already exists.`)
+    return
   }
 
   let pushPort = getAvailablePushPort();
   let restPort = pushPort + 1000;
   const env = sysEnv();
+
+  if (args.baseDir) {
+    if (existsSync(args.baseDir)) {
+      env.server_home = join(args.baseDir, 'server');
+      env.ui_home = join(args.baseDir, 'ui');
+    } else {
+      failed(`App base dir ${args.baseDir}doesn't exist`)
+      return
+    }
+  }
+
   let main = worker({
     ...env,
     route: endpoint,
@@ -157,6 +190,6 @@ const cmd = actions[action];
 if (cmd) {
   cmd();
 } else {
-  console.log(`Invalid command ${action}\n`, `Usage : ${basename(argv.$0)} add|remove|list`);
+  console.log(`Invalid command ${action}\n`, `Usage : add|remove|list`);
 }
 
