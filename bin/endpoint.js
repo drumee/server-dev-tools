@@ -6,7 +6,7 @@ const { sysEnv, Template } = require("@drumee/server-essentials");
 const { writeConfigs, failed } = require("../lib");
 const infra_dir = "/etc/drumee/infrastructure";
 const confFile = join(infra_dir, "ecosystem.json");
-const args = require('./args');
+const args = require('./args/endpoint');
 const { action, endpoint, instances } = args;
 
 const {
