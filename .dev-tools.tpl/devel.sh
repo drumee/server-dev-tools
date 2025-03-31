@@ -15,4 +15,4 @@
 # https://github.com/drumee/documentation/blob/main/templates/docker/devel-template.yaml
 # You may change to values to your own environment
 export CONTAINER_NAME=drumee-dev
-export DEST_DIR=${HOME}/.config/drumee-dev
+export DEST_DIR=${HOME}/.config/${CONTAINER_NAME}
