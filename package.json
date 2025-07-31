@@ -13,6 +13,9 @@
   "author": "Somanos Sar <somanos@drumee.com>",
   "license": "MIT",
   "dependencies": {
+    "@drumee/setup-schemas": "^1.0.13",
+    "@somanos/sys-conf": "^1.0.0",
+    "argparse": "^2.0.1",
     "jsonfile": "^6.1.0",
     "shelljs": "^0.8.5",
     "yargs": "^17.7.2"

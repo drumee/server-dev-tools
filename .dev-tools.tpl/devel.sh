@@ -1,8 +1,23 @@
-# Uncomment if you are syncing on a remote host
-# Ensure that you have proper creadentials
-# DEST_USER must be valid on the remote host
+script_dir="$(dirname "$(readlink -f "$0")")"
+
+# DEST_DIR is the location where your local changes will be synced to 
+# It's possible to run several Drumee Intances (endpoints) on a same machine. 
+# Keep ENDPOINT=main unless you ahe created a diffrent
+# export ENDPOINT=main
+
+# Syncing changes on remote server
+# Ensure that you have proper creadentials to access remote filesystem
 # export DEST_HOST=example.org 
 # export DEST_USER=$USER
 
-# DEST_DIR is the location vers your local changes will be synced to 
-export DEST_DIR=/home/$DEST_USER/build/
+# Syncing changes on a local Docker container
+# export CONTAINER_NAME
+
+# This is the default setup that matches the Docker Compose file from
+# https://github.com/drumee/documentation/blob/main/templates/docker/devel-template.yaml
+# export CONTAINER_NAME=perdrix
+# export DEST_DIR=${HOME}/.config/${CONTAINER_NAME}/server
+
+# Syncing changes on a local host
+# export DEST_DIR=$HOME/.config/Drumee/
+# export DEST_DIR=$(dirname "$script_dir/..")/build
