@@ -51,6 +51,9 @@ if [ "$AFTER_SYNC" != "" ]; then
   export reload_after_update="$env_dir/$AFTER_SYNC"
 fi
 
+# Trigger sync at start
+(sleep 5 && touch $env_file)&
+
 if [[ "$worker" =~ deploy ]]; then
   if [ -z "$DEST_HOST" ]; then
     echo "Deploying files from $SRC_PATH, shall locally sync to $DEST_DIR"
@@ -75,3 +78,5 @@ else
     ${script_dir}/watch.js --dir=$SRC_PATH --on-change="deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR"
   fi
 fi
+
+sleep 5

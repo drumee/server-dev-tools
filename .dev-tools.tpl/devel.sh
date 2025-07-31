@@ -1,4 +1,10 @@
+#!/usr/bin/bash
+
 script_dir="$(dirname "$(readlink -f "$0")")"
+
+if [ -f /etc/drumee/drumee.sh ]; then
+  source /etc/drumee/drumee.sh
+fi
 
 # DEST_DIR is the location where your local changes will be synced to 
 # It's possible to run several Drumee Intances (endpoints) on a same machine. 
