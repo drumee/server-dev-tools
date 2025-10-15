@@ -10,18 +10,31 @@ src_dir=$PWD
 pid=$$
 env_dir="$src_dir/.dev-tools.rc"
 env_file="$env_dir/devel.sh"
-if [[ "$worker" =~ deploy ]]; then
-  env_file="$env_dir/deploy.sh"
+
+export IGNORE_FILE=$env_dir/ignored.txt
+target=$1
+if [ "$target" = "" ]; then
+  if [[ "$worker" =~ deploy ]]; then
+    target=deploy.sh
+  else
+    target=devel.sh
+  fi
+else
+  if [[ "$target" =~ ^.+\.(sh|bash)$ ]]; then
+    target=$target
+  else
+    target=${target}.sh
+  fi
 fi
 
-echo "Using resource file from $env_file"
+env_file=$env_dir/$target
+echo Using env file from $env_file
 
 if [ -f "$env_file" ]; then
   source $env_file
 else
   echo "Resource file was not found"
   exit 1
-
 fi
 
 if [ "$DEST_USER" = "" ]; then
@@ -34,7 +47,6 @@ if [ "$DEST_DIR" = "" ]; then
 fi
 
 
-# src_dir is provided by $script_dir/functions.sh
 if [ "$SRC_PATH" = "" ]; then
   SRC_PATH=$src_dir
 fi
