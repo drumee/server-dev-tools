@@ -19,6 +19,6 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@drumee/server-essentials": "^1.1.17"
+    "@drumee/server-essentials": "^1.2.3"
   }
 }
