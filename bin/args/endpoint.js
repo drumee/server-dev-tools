@@ -19,7 +19,14 @@ parser.add_argument("--watchDirs", {
 
 parser.add_argument("--baseDir", {
 	type: String,
-	help: "Path to the server code",
+	default: process.env.DRUMEE_RUNTIME_DIR,
+	help: "Path to the backend base",
+});
+
+parser.add_argument("--watchDefault", {
+	type: "int",
+	default: 1,
+	help: "Enable watch",
 });
 
 parser.add_argument("--watchDelay", {

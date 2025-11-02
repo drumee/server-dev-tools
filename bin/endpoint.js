@@ -7,7 +7,7 @@ const { writeConfigs, failed } = require("../lib");
 const infra_dir = "/etc/drumee/infrastructure";
 const confFile = join(infra_dir, "ecosystem.json");
 const args = require('./args/endpoint');
-const { action, endpoint, instances } = args;
+const { action, endpoint, instances, baseDir } = args;
 
 const {
   rmSync, existsSync
@@ -30,12 +30,15 @@ function worker(data, instances = 1) {
     name,
     server_dir,
     ui_dir,
-    runtime_dir,
+    base_dir,
+    ui_home,
+    server_home
   } = data;
-  if (!server_dir) server_dir = join(runtime_dir, 'server');
-  if (!ui_dir) ui_dir = join(runtime_dir, 'ui');
-  let server_home = data.server_home || `${server_dir}/${route}`;
-  let ui_home = data.ui_home || `${ui_dir}/${route}`;
+  if (!base_dir) base_dir = args.baseDir || process.env.DRUMEE_RUNTIME_DIR;
+  if (!server_dir) server_dir = join(base_dir, 'server');
+  if (!ui_dir) ui_dir = join(base_dir, 'ui');
+  ui_home = ui_home || `${ui_dir}/${route}`;
+  server_home = server_home || `${server_dir}/${route}`;
   let exec_mode = 'fork_mode';
   if (instances > 1) {
     exec_mode = 'cluster_mode';
@@ -57,27 +60,28 @@ function worker(data, instances = 1) {
     instances
   };
 
+  opt.watch = []
   if (args.watchDirs) {
-    let dirs = args.watchDirs.split(/,+/);
-    if (dirs.length) {
-      opt.watch = dirs;
-      opt.watch_delay = args.watchDelay;
-      if (args.watchSymLinks) {
-        opt.watch_options = {
-          followSymlinks: true
-        }
-      } else {
-        opt.watch_options = {
-          followSymlinks: false
-        }
+    opt.watch = args.watchDirs.split(/,+/);
+  } else if (args.watchDefault) {
+    opt.watch = [ui_dir, server_dir];
+  }
+  if (opt.watch.length) {
+    opt.watch_delay = args.watchDelay;
+    if (args.watchSymLinks) {
+      opt.watch_options = {
+        followSymlinks: true
       }
-      let ignored = args.watchIgnore.split(/,+/);
-      if (ignored.length) {
-        opt.ignore_watch = ignored;
+    } else {
+      opt.watch_options = {
+        followSymlinks: false
       }
     }
+    let ignored = args.watchIgnore.split(/,+/);
+    if (ignored.length) {
+      opt.ignore_watch = ignored;
+    }
   }
-
   return opt;
 }
 
@@ -126,9 +130,11 @@ function add() {
       env.server_home = join(args.baseDir, 'server');
       env.ui_home = join(args.baseDir, 'ui');
     } else {
-      failed(`App base dir ${args.baseDir}doesn't exist`)
+      failed(`App base dir ${args.baseDir} doesn't exist`)
       return
     }
+  } else {
+    failed(`App base dir ${args.baseDir} is required`)
   }
 
   let main = worker({
