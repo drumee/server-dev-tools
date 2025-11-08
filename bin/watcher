@@ -64,7 +64,7 @@ if [ "$AFTER_SYNC" != "" ]; then
 fi
 
 # Trigger sync at start
-(sleep 5 && touch $env_file)&
+(sleep 5 && touch $SRC_PATH/package.json)&
 
 if [[ "$worker" =~ deploy ]]; then
   if [ -z "$DEST_HOST" ]; then
