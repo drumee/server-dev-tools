@@ -34,7 +34,7 @@ function worker(data, instances = 1) {
     ui_home,
     server_home
   } = data;
-  if (!base_dir) base_dir = args.baseDir || process.env.DRUMEE_RUNTIME_DIR;
+  if (!base_dir) base_dir = baseDir || process.env.DRUMEE_RUNTIME_DIR;
   if (!server_dir) server_dir = join(base_dir, 'server');
   if (!ui_dir) ui_dir = join(base_dir, 'ui');
   ui_home = ui_home || `${ui_dir}/${route}`;
@@ -125,16 +125,18 @@ function add() {
   let restPort = pushPort + 1000;
   const env = sysEnv();
 
-  if (args.baseDir) {
-    if (existsSync(args.baseDir)) {
-      env.server_home = join(args.baseDir, 'server');
-      env.ui_home = join(args.baseDir, 'ui');
+  if (baseDir) {
+    if (existsSync(baseDir)) {
+      env.server_home = join(baseDir, 'server', endpoint);
+      env.ui_home = join(baseDir, 'ui', endpoint);
+      env.ui_plugins_home = join(baseDir, 'plugins', 'ui', endpoint);
+      env.server_plugins_home = join(baseDir, 'plugins', 'server', endpoint);
     } else {
-      failed(`App base dir ${args.baseDir} doesn't exist`)
+      failed(`App base dir ${baseDir} doesn't exist`)
       return
     }
   } else {
-    failed(`App base dir ${args.baseDir} is required`)
+    failed(`App base dir ${baseDir} is required`)
   }
 
   let main = worker({

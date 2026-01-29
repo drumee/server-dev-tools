@@ -19,7 +19,7 @@ parser.add_argument("--watchDirs", {
 
 parser.add_argument("--baseDir", {
 	type: String,
-	default: process.env.DRUMEE_RUNTIME_DIR,
+	default: process.env.DRUMEE_RUNTIME_DIR || "/srv/drumee/runtime",
 	help: "Path to the backend base",
 });
 
