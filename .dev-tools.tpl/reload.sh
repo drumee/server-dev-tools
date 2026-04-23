@@ -1,5 +1,8 @@
 #!/bin/bash
-
+if [ "$DONT_RELOAD" != "" ]; then
+  echo Reload intentionnaly skipped
+  exit 0
+fi
 # reload after sync/deployment
 if [ "$ENDPOINT" = "" ]; then
   echo Nothing to run after deploy

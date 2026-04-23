@@ -13,8 +13,9 @@ function checSanity(){
     exit 1
   fi
 
-  if [[ ! "$dest_path" =~ ^/(srv|home|var|opt)/+.+$ ]]; then
-    echo Invalid destination $dest_path
+  if [[ "$dest_path" =~ ^/(bin|sbin|usr\/bin|usr\/sbin|proc|dev|boot|etc|root|run|System|cores/)/+.+$ ]]; then
+    echo Looks like you are trying to install into a system-related directory, $dest_path
+    echo This may ahrm you system integrity. Please select another destination folder
     exit 1
   fi
 }
