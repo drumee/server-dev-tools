@@ -26,10 +26,11 @@ parser.add_argument("--type", {
   help: "app | plugin",
 });
 
-parser.add_argument("--runtime-dir", {
+parser.add_argument("--root-dir", {
   type: String,
   default:  "/srv/drumee/runtime",
 });
+
 
 parser.add_argument("--plugin", {  
   type: String,
