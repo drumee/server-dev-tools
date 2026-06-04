@@ -65,29 +65,33 @@ fi
 
 # Trigger sync at start
 (sleep 5 && touch $SRC_PATH/package.json)&
-
-if [[ "$worker" =~ deploy ]]; then
-  if [ -z "$DEST_HOST" ]; then
-    echo "Deploying files from $SRC_PATH, shall locally sync to $DEST_DIR"
-    deployOnSameHost $SRC_PATH $DEST_DIR $USER $USER/service
-  else
-    dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
-    ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
-    echo "Deploying files from $SRC_PATH, shall remotely deploy to $dest_dir"
-    deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR 
-  fi
-  if [ -x $reload_after_update ]; then
-    $reload_after_update
-  fi
+if [[ "$NO_WATCH" =~ yes ]]; then
+  echo "Deploying files from $SRC_PATH, shall locally sync to $DEST_DIR"
+  deployOnSameHost $SRC_PATH $DEST_DIR $USER $USER/service
 else
-  if [ -z "$DEST_HOST" ]; then
-    echo "Watching files from $SRC_PATH, shall locally sync to $DEST_DIR"
-    ${script_dir}/watch.js --dir=$SRC_PATH --on-change="deployOnSameHost $SRC_PATH $DEST_DIR"
+  if [[ "$worker" =~ deploy ]]; then
+    if [ -z "$DEST_HOST" ]; then
+      echo "Deploying files from $SRC_PATH, shall locally sync to $DEST_DIR"
+      deployOnSameHost $SRC_PATH $DEST_DIR $USER $USER/service
+    else
+      dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
+      ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
+      echo "Deploying files from $SRC_PATH, shall remotely deploy to $dest_dir"
+      deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR 
+    fi
+    if [ -x $reload_after_update ]; then
+      $reload_after_update
+    fi
   else
-    dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
-    ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
-    echo "Watching files from $SRC_PATH, shall remotely sync to $dest_dir"
-    ${script_dir}/watch.js --dir=$SRC_PATH --on-change="deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR"
+    if [ -z "$DEST_HOST" ]; then
+      echo "Watching files from $SRC_PATH, shall locally sync to $DEST_DIR"
+      ${script_dir}/watch.js --dir=$SRC_PATH --on-change="deployOnSameHost $SRC_PATH $DEST_DIR"
+    else
+      dest_dir="${DEST_USER}@${DEST_HOST}:${DEST_DIR}"
+      ssh ${DEST_HOST} mkdir -p ${DEST_DIR}
+      echo "Watching files from $SRC_PATH, shall remotely sync to $dest_dir"
+      ${script_dir}/watch.js --dir=$SRC_PATH --on-change="deployOnRemoteHost $SRC_PATH $DEST_USER $DEST_HOST $DEST_DIR"
+    fi
   fi
 fi
 
